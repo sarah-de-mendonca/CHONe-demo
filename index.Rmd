@@ -19,7 +19,6 @@ The code I used to map out my study sites is 'hidden', you can see it by downloa
 # set standard projection
 projll <- "+proj=moll +lon_0=0"
 
-
 # set Atlantic LTRANS connectivity project
 bcbbox <- c(-70.88808,39.89707,-47.28724,53.56291)
 BC <- cbind(
@@ -35,30 +34,18 @@ BC <- cbind(
          geometry=.)%>%    # finally make it an sf object
     st_cast("MULTIPOLYGON")
 
-# set Atlantic LTRANS connectivity project
-Atlbbox <- c(-135.8003,45.3837,-122.0694,56.1647)
-Atlantic <- cbind(
-            c(Atlbbox[1],Atlbbox[3],Atlbbox[3],Atlbbox[1],Atlbbox[1]),
-            c(Atlbbox[2],Atlbbox[2],Atlbbox[4],Atlbbox[4],Atlbbox[2])
-        ) %>% 
-    list() %>%                  # put that matrix in a list
-    st_polygon() %>%            # put that list in a simple features polygon
-    st_sfc(crs = projll) %>%  # put that polygon into a simple features column and give projection info
-    st_sf(name="Remi Daigle",
-         description="BC LTRANS connectivity",
-         CHONeProject="1.1.1",
-         geometry=.) %>%    # finally make it an sf object
-    st_cast("MULTIPOLYGON")
+
+
 
 # bind all my sites together
-sites <- rbind(BC,Atlantic)
+sites <- rbind(BC)
 
 ```
 
 Here's the map:
 
 ```{r,echo=FALSE}
-cols <- c("red","yellow")
+cols <- c("red")
 
 leaflet(sites) %>%
     addTiles() %>% 
