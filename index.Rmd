@@ -1,0 +1,76 @@
+---
+title: "Sarah de Mendonca"
+output: html_notebook
+---
+
+```{r load packages,message=FALSE,cache=TRUE,echo=FALSE}
+require(tidyverse)
+require(sf)
+require(leaflet)
+
+```
+
+
+I am attending a CHONe dataworkshop.
+
+The code I used to map out my study sites is 'hidden', you can see it by downloading the code (top right of the page), or looking at my [repo](https://github.com/remi-daigle/CHONE-demo/). For OHI, I have a shapefile, but for the others, I'm only creating a box around the coordinates.
+
+```{r prepare spatial data,cache=TRUE,echo=FALSE}
+# set standard projection
+projll <- "+proj=moll +lon_0=0"
+
+
+# set Atlantic LTRANS connectivity project
+bcbbox <- c(-70.88808,39.89707,-47.28724,53.56291)
+BC <- cbind(
+            c(bcbbox[1],bcbbox[3],bcbbox[3],bcbbox[1],bcbbox[1]),
+            c(bcbbox[2],bcbbox[2],bcbbox[4],bcbbox[4],bcbbox[2])
+        ) %>% 
+    list() %>%                  # put that matrix in a list
+    st_polygon() %>%            # put that list in a simple features polygon
+    st_sfc(crs = projll) %>%  # put that polygon into a simple features column and give projection info
+    st_sf(name="Remi Daigle",
+         description="Atlantic LTRANS connectivity",
+         CHONeProject="1.1.1",
+         geometry=.)%>%    # finally make it an sf object
+    st_cast("MULTIPOLYGON")
+
+# set Atlantic LTRANS connectivity project
+Atlbbox <- c(-135.8003,45.3837,-122.0694,56.1647)
+Atlantic <- cbind(
+            c(Atlbbox[1],Atlbbox[3],Atlbbox[3],Atlbbox[1],Atlbbox[1]),
+            c(Atlbbox[2],Atlbbox[2],Atlbbox[4],Atlbbox[4],Atlbbox[2])
+        ) %>% 
+    list() %>%                  # put that matrix in a list
+    st_polygon() %>%            # put that list in a simple features polygon
+    st_sfc(crs = projll) %>%  # put that polygon into a simple features column and give projection info
+    st_sf(name="Remi Daigle",
+         description="BC LTRANS connectivity",
+         CHONeProject="1.1.1",
+         geometry=.) %>%    # finally make it an sf object
+    st_cast("MULTIPOLYGON")
+
+# bind all my sites together
+sites <- rbind(BC,Atlantic)
+
+```
+
+Here's the map:
+
+```{r,echo=FALSE}
+cols <- c("red","yellow")
+
+leaflet(sites) %>%
+    addTiles() %>% 
+    addPolygons(group = ~description,
+                color = cols) %>%
+     addLegend("topright", 
+               colors = cols,
+               labels = unique(sites$description))
+    
+```
+
+And here's the raw data
+```{r,echo=FALSE}
+sites
+```
